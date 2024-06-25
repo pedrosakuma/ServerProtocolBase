@@ -5,9 +5,8 @@ using System.Net.Sockets;
 
 namespace ServerConsole.Server
 {
-    public class EchoSessionHandler : AbstractExecutorSessionHandler, IMessageResolver, IServerSessionHandler
+    public class EchoSessionHandler : AbstractExecutorSessionHandler, IMessageResolver 
     {
-        private IServerSessionOwner? owner;
         public bool TryGetMessageParser(int messageTypeId, [NotNullWhen(true)] out IMessageParser? parser)
         {
             switch (messageTypeId)
@@ -46,14 +45,7 @@ namespace ServerConsole.Server
 
         private async Task HandleEchoMessage(EchoMessage echoMessage)
         {
-            owner.SendToAll(echoMessage);
-            //await SendAsync(echoMessage);
-        }
-
-        public void Start(IServerSessionOwner owner, Guid id, Socket socket)
-        {
-            this.owner = owner;
-            base.Start(id, socket);
+            await SendAsync(echoMessage);
         }
     }
 }

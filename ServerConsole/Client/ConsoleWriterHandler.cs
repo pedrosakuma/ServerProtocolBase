@@ -4,19 +4,12 @@ using System.Net.Sockets;
 
 namespace ServerConsole.Client
 {
-    internal class ConsoleWriterHandler : AbstractSessionHandler, IMessageResolver, IClientSessionHandler
+    internal class ConsoleWriterHandler : AbstractClientSessionHandler, IMessageResolver
     {
-        private IClientSessionOwner owner;
 
         public override IMessageResolver CreateMessageResolver()
         {
             return this;
-        }
-
-        public void Start(IClientSessionOwner owner, Guid id, Socket socket)
-        {
-            this.owner = owner;
-            base.Start(id, socket);
         }
 
         public bool TryGetMessageParser(int messageTypeId, [NotNullWhen(true)] out IMessageParser? parser)

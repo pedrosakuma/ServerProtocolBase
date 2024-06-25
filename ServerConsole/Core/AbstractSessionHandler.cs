@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Net.Sockets;
 using System.Threading.Channels;
 
 namespace ServerConsole.Core
@@ -8,7 +9,6 @@ namespace ServerConsole.Core
         private const int BufferSize = 1024;
         private Guid? id;
         private Socket? socket;
-        private Action? disconnected;
         private Task receiver;
         private Task sender;
 
@@ -24,8 +24,8 @@ namespace ServerConsole.Core
 
         public abstract IMessageResolver CreateMessageResolver();
 
-        public ChannelReader<IMessage> ReceiverChannel => receiverChannel.Reader;
-        public ChannelWriter<IFormattableMessage> SenderChannel => senderChannel.Writer;
+        //public ChannelReader<IMessage> ReceiverChannel => receiverChannel.Reader;
+        //public ChannelWriter<IFormattableMessage> SenderChannel => senderChannel.Writer;
         public Guid Id => id ?? Guid.Empty;
 
         public void Send(IFormattableMessage message)
@@ -36,6 +36,15 @@ namespace ServerConsole.Core
         public async Task SendAsync(IFormattableMessage message)
         {
             await senderChannel.Writer.WriteAsync(message);
+        }
+
+        public ValueTask<bool> WaitToReadAsync()
+        {
+            return receiverChannel.Reader.WaitToReadAsync();
+        }
+        public bool TryRead([NotNullWhen(true)] out IMessage? message)
+        {
+            return receiverChannel.Reader.TryRead(out message);
         }
 
         public virtual void Start(Guid id, Socket socket)

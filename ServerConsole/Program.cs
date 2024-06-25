@@ -16,12 +16,12 @@ namespace ServerConsole
             await client.ConnectAsync();
             Timer timer = new Timer(o =>
             {
-                client.Session.SenderChannel.WriteAsync(new EchoMessage("Hello!")).AsTask().Wait();
+                client.Session.Send(new EchoMessage("Hello!"));
             }, null, 1000, 1000);
 
-            while (await client.Session.ReceiverChannel.WaitToReadAsync())
+            while (await client.Session.WaitToReadAsync())
             {
-                if (client.Session.ReceiverChannel.TryRead(out IMessage? message))
+                if (client.Session.TryRead(out var message))
                 {
                     switch (message)
                     {
