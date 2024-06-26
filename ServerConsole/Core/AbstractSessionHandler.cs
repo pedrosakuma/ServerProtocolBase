@@ -24,8 +24,6 @@ namespace ServerConsole.Core
 
         public abstract IMessageResolver CreateMessageResolver();
 
-        //public ChannelReader<IMessage> ReceiverChannel => receiverChannel.Reader;
-        //public ChannelWriter<IFormattableMessage> SenderChannel => senderChannel.Writer;
         public Guid Id => id ?? Guid.Empty;
 
         public void Send(IFormattableMessage message)
