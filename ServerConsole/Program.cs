@@ -9,8 +9,10 @@ namespace ServerConsole
     {
         static async Task Main(string[] args)
         {
+            CancellationTokenSource source = new CancellationTokenSource();
+            var token = source.Token;
             using TcpServer<EchoSessionHandler> server = new TcpServer<EchoSessionHandler>(IPAddress.Loopback, 8080, 100);
-            server.Start(CancellationToken.None);
+            server.Start(token);
 
             using TcpClient<ConsoleWriterHandler> client = new TcpClient<ConsoleWriterHandler>(IPAddress.Loopback, 8080);
             await client.ConnectAsync();
@@ -19,21 +21,29 @@ namespace ServerConsole
                 client.Session.Send(new EchoMessage("Hello!"));
             }, null, 1000, 1000);
 
-            while (await client.Session.WaitToReadAsync())
+            var clientTask = Task.Run(() =>
             {
-                if (client.Session.TryRead(out var message))
+                while (!token.IsCancellationRequested)
+                    Update(client);
+            });
+            Console.ReadLine();
+            source.Cancel();
+            await clientTask;
+        }
+
+        private static void Update(TcpClient<ConsoleWriterHandler> client)
+        {
+            if (client.Session.TryRead(out var message))
+            {
+                switch (message)
                 {
-                    switch (message)
-                    {
-                        case EchoMessage echoMessage:
-                            Console.WriteLine($"Received message EchoMessage {{ Text={echoMessage.Text} }}");
-                            break;
-                        default:
-                            break;
-                    }
+                    case EchoMessage echoMessage:
+                        Console.WriteLine($"Received message EchoMessage {{ Text={echoMessage.Text} }}");
+                        break;
+                    default:
+                        break;
                 }
             }
-            Console.ReadLine();
         }
     }
 }
