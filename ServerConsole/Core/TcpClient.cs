@@ -29,6 +29,11 @@ namespace ServerConsole.Core
         public async Task ConnectAsync()
         {
             await socket.ConnectAsync(address, port);
+            CreateAndStartSession();
+        }
+
+        private void CreateAndStartSession()
+        {
             session = new SessionHandler();
             session.Start(this, Guid.Empty, socket);
         }
@@ -36,8 +41,7 @@ namespace ServerConsole.Core
         public void Connect()
         {
             socket.Connect(address, port);
-            session = new SessionHandler();
-            session.Start(this, Guid.Empty, socket);
+            CreateAndStartSession();
         }
 
         public void Disconnected(Guid key)
