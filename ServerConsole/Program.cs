@@ -15,7 +15,7 @@ namespace ServerConsole
             server.Start(token);
 
             using TcpClient<ConsoleWriterHandler> client = new TcpClient<ConsoleWriterHandler>(IPAddress.Loopback, 8080);
-            await client.ConnectAsync();
+            client.Connect();
             Timer timer = new Timer(o =>
             {
                 client.Session.Send(new EchoMessage("Hello!"));
