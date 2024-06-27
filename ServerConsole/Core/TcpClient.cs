@@ -33,6 +33,13 @@ namespace ServerConsole.Core
             session.Start(this, Guid.Empty, socket);
         }
 
+        public void Connect()
+        {
+            socket.Connect(address, port);
+            session = new SessionHandler();
+            session.Start(this, Guid.Empty, socket);
+        }
+
         public void Disconnected(Guid key)
         {
             // Reconnection logic
